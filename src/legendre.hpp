@@ -143,4 +143,57 @@ namespace Legendre
 		std::cout << "\n";
 	};
 
+	// Generates coefficients for shifted Legendre polynomial /P(N,x)
+	// Uses the Rodrigues Formula:
+	//           1     d^n
+	//	Pn(x) = --- * ---- [ (x^2-x)^n ] , n E N0
+	//           n!   d^nx
+	void ShiftedCoefficients(
+		std::uint8_t const& N
+	)
+	{
+		// x^2-x
+		std::vector<Integer> base_polynomial{ 0, -1, 1 };
+
+		// (x^2-x)^n
+		auto power = Polynomial::Power(base_polynomial, N);
+
+		// d^n/d^nx (power)
+		auto derivative = Polynomial::Derivative(power, N);
+
+		// n!
+		Integer factor = Factorial(N);
+
+		Integer const gcd = GCD(factor, GCD(derivative));
+
+		std::cout << "/P(" << N + 0 << ",x) = ";
+
+		std::int64_t const n_elements = static_cast<int16_t>(derivative.size()) - 1;
+
+		Integer const prefix = factor / gcd;
+		if (prefix != 1)
+			std::cout << "1/" << prefix << " ( ";
+
+		for (std::int64_t i{ n_elements }; i > -1; --i)
+		{
+			if (derivative[i] != 0)
+			{
+				Integer const value = abs(derivative[i]) / gcd;
+
+				if (i != n_elements)
+					std::cout << (derivative[i].is_positive() ? "+ " : "- ");
+				if ((abs(value) != 1) || (i == 0))
+					std::cout << value << " ";
+				if (i > 1)
+					std::cout << "x^" << i << " ";
+				else if (i == 1)
+					std::cout << "x ";
+			}
+		}
+		if (prefix != 1)
+			std::cout << ")";
+
+		std::cout << "\n";
+	};
+
 };
